@@ -20,6 +20,39 @@
 
 7. 如果执行6出现错误:fatal: `refusing to merge unrelated histories`(拒绝合并不想关历史)，则执行`git pull origin master --allow-unrelated-histories`，将两个独立的仓库合并（会合并历史），再执行6
 
+8. <font color=ff0000>**冲突**</font>：执行第五步`git pull origin master`时，
+
+   ~~~
+   error: Your local changes to the following files would be overwritten by merge:XXX
+   Please commit your changes or stash them before you merge.
+   Aborting
+   ~~~
+
+   三种解决方法：
+
+   - 你先提交自己对文件的修改，再去拉代码
+
+     ~~~git
+     git add .  #修改放到暂存区 
+     git commit -m '哥不服'  #提交到本地仓库
+     git push  #假设就一个远程分支，该省略的全省了
+     ~~~
+
+   - 你先把自己修改的内容藏起来
+
+     ```git
+     git stash #先把自己的修改都存储起来
+     git pull  #拉新代码
+     git stash pop  #再把存储的代码拿出来，在本地仓库自动合并
+     ```
+
+   - 远程分支为准，自己在本地的修改不要了
+
+     ```git
+     git reset --hard #放弃本地修改
+     git pull #拉远程分支代码
+     ```
+
 ### git pull 
 
 pull ≈ fetch + merge，fetch并不会自动合并或修改当前的工作，必须手动将其合并到工作当中。
@@ -29,3 +62,11 @@ pull ≈ fetch + merge，fetch并不会自动合并或修改当前的工作，�
 ### git clone
 
 在本地文件夹下(非本地仓库，无.git文件),从gitHub上down下文件，用`git clone` 拷贝，pull和push只能在`git remote add origin XXXX.git`操作(关联相关的远程库)之后使用
+
+### git add
+
+- **git add . ** 提交新文件(new)和被修改(modified)文件，不包括被删除(deleted)文件
+
+- **git add -u**  提交被修改(modified)和被删除(deleted)文件，不包括新文件(new)
+- **git add -A**  提交所有变化
+
