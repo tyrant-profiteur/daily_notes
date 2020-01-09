@@ -8,8 +8,6 @@
 
 4. `git remote add origin git@github.com XXXX.git` 关联`GitHub`仓库
 
-   ![img](E:\daily_notes\Java\pictures\Git-0001)
-
    ​	如果出现错误：fatal: `remote origin already exists`，则执行以下语句：`git remote rm origin`，再执行4
 
 5. `git push origin master`(git push -u origin master,第一次加上 -u,创建)
