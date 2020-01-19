@@ -118,6 +118,63 @@
 - **强制类型转换**
 
   将取值范围大的类型强制转换为取值范围小的类型
+  
+  ![1579437664316](E:\Java\new_Java_Study\Git_projects\daily_notes\pictures\强制类型转换示意图.png)
+  
+  <font color='ff0000'>注：</font>
+  
+  - 浮点转为整数，直接取消小数点，会造成数据损失精度
+  - int强制转为short，砍掉两个字节，会造成数据丢失
+  
+- **ASCII编码表**
+
+  ~~~Java
+  System.out.println('a'+1);  //98
+  ~~~
+
+  | 字符 | 数值 |
+  | :--: | :--: |
+  |  0   |  48  |
+  |  9   |  57  |
+  |  A   |  65  |
+  |  Z   |  90  |
+  |  a   |  97  |
+  |  z   | 122  |
+
+- **运算符**
+
+  +，-，*，/，%，++，--
+
+  <font color='ff0000'>注：</font>
+
+  ​	整数使用以上运算符，无论怎么计算都不会得到小数
+
+  ~~~java
+  int i = 1234;
+  System.out.println(i/1000);//1
+  //1
+  System.out.println((double)(i/1000) + getType((double)(i/1000)));//1.0 class java.lang.Double
+  //2
+  System.out.println((double)i/1000 + getType((double)i/1000));//1.234 class java.lang.Double
+  System.out.println((double)i/(double) 1000 +getType((double)i/(double)1000) );//1.234 class java.lang.Double
+  double d = 1234;
+  //3
+  System.out.println(i/1000 +getType(i/1000));//1 class java.lang.Integer
+  System.out.println(i/(double)1000 + getType(i/(double)1000));//1.234 class java.lang.Double
+  
+  DecimalFormat df = new DecimalFormat("0.00");
+  String num = df.format((float)i/1000);
+  System.out.println(num);//1.23
+  
+  float f = new BigDecimal((float)i/1000).setScale(2,BigDecimal.ROUND_HALF_UP).floatValue();
+  System.out.println(f);//1.23
+  float f1 = new BigDecimal((float)i/1000).floatValue();
+  System.out.println(f1);//1.234
+  ~~~
+
+  - 1: i/1000时，i是int类型，之后对(i/1000)的结果 1进行double强制转换，1转化为1.0
+  - 2: i/1000时，强制转化为double类型，在进行计算时，始终为double类型
+  - 3: i 与整数1000 相除时，会先强制提升为int再进行计算
 
 ### 问题总结
 
