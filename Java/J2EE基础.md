@@ -109,7 +109,7 @@
 
   将取值范围小的类型自动提升为取值范围大的类型
 
-  ![1579093176306](E:\Java\new_Java_Study\Git_projects\daily_notes\pictures\自动类型转换示意图.png)
+  ![1579093176306](E:\Java\new_Java_Study\daily_notes\pictures\自动类型转换示意图.png)
 
   **转换规则：**
 
@@ -119,7 +119,7 @@
 
   将取值范围大的类型强制转换为取值范围小的类型
   
-  ![1579437664316](E:\Java\new_Java_Study\Git_projects\daily_notes\pictures\强制类型转换示意图.png)
+  ![1579437664316](E:\Java\new_Java_Study\daily_notes\pictures\强制类型转换示意图.png)
   
   <font color='ff0000'>注：</font>
   
@@ -211,7 +211,7 @@
 >
 > JVM可以理解的代码叫做字节码（.class文件），只面向虚拟机。Java通过字节码方式，在解决了传统解释型语言执行效率低问题的同时，又保留了解释性语言的可移植性。
 
-![Java程序运行过程](E:\Java\new_Java_Study\Git_projects\daily_notes\pictures\Java 程序运行过程.png)
+![Java程序运行过程](E:\Java\new_Java_Study\daily_notes\pictures\Java 程序运行过程.png)
 
 .class文件->机器码这步，JVM类加载器加载字节码文件，解释器进行逐行解释执行，但是有些代码会被经常性调用(热点代码[^hotSpot])，后来引进了JIT编译器(运行时编译)。当JIT完成第一次编译，会将字节码对应的机器码保存下来，下次可以直接使用。Java是编译与解释共存的语言的原因。
 
@@ -257,7 +257,7 @@ JDK>JRE>JVM
 | **内存大小** |                   2个字节                    |                若干个字节                |
 
 
-![img](E:\Java\new_Java_Study\Git_projects\daily_notes\pictures\类型所占存储空间.jpg)
+![img](E:\Java\new_Java_Study\daily_notes\pictures\类型所占存储空间.jpg)
 
 
 
@@ -294,7 +294,3 @@ JDK>JRE>JVM
 [^hotSpot]:采用惰性评估(Lazy Evaluation)的做法，根据二八定律，消耗大部分资源的小部分代码，也就是JIT需要编译的部分。JVM会根据每次执行情况做出一些优化，因此执行次数越多速度越快。JDK 9引入了AOT(Ahead of Time Compilation)编译模式，直接将字节码编译成机器码，避免了JIT预热等开销。JDK支持分层编译和AOT协作使用。编译质量上，AOT不如JIT。
 
 [^变量]: 每次只能保存一个数据，必须明确保存的数据类型
-=======
-![img](E:\Git\daily_notes\pictures\类型所占存储空间.jpg)
-
->>>>>>> f936ec728219f12925d07ed134c2d3177786a0dc
