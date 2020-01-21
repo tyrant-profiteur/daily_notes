@@ -610,3 +610,9 @@ Producer cglibProducer = (Producer)Enhancer.create(producer.getClass(), new Meth
         </aop:aspect>
     </aop:config>
 ```
+
+## 5.问题
+
+#### 什么是申明式事务
+
+​	通过配置的方式控制事务
