@@ -28,7 +28,279 @@
 
      ​	使用反射写死全限定类名后修改不便捷
 
------
+#### 获取对象
+
+~~~Java
+//1.获取核心容器对象
+	ApplicationContext ac = new ClassPathXmlApplicationContext("bean.xml");
+//根据id获取bean对象,两种方法
+	IAccountService as = (IAccountService) ac.getBean("accountService");
+	IAccountDao adao = ac.getBean("accountDao",IAccountDao.class);
+~~~
+
+其中第一步获取核心容器对象的过程和工厂模式创建一样，只是读取配置文件，创建对象，存入Map的过程，Spring都帮我们完成了。工厂模式如下：
+
+~~~java
+public class BeanFactory {
+    //定义properties对象
+    private static Properties props;
+
+    //4.定义一个Map，用于存放我们要创建的对象，我们称之为容器,来实现单例而不是多例
+    private static Map<String,Object> beans;
+
+    //使用静态代码块为properties对象赋值
+    static {
+        //实例化对象
+        props = new Properties();
+        //获取properties流对象
+        try {
+            /**注意此时不能使用 InputStream i = new FileInputStream("")来创建流对象
+             * 写绝对路径，不能保证工程部署环境都有c盘D盘
+             * 写相对路径src，web工程部署后src就没了，用不了
+            */
+            InputStream in = BeanFactory.class.getClassLoader().getResourceAsStream("bean.properties");
+            props.load(in);
+            //实例化容器
+            beans = new HashMap<String, Object>();
+            //去除配置文件所有的key
+            Enumeration keys= props.keys();
+            //遍历枚举
+            while (keys.hasMoreElements()){
+                //取出每个key
+                String key = keys.nextElement().toString();
+                //获取value
+                String beanPath = props.getProperty(key);
+                //反射创建对象
+                Object value = Class.forName(beanPath).newInstance();
+                //存入容器
+                beans.put(key,value);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**根据Bean名称，获取Bean对象
+    public static Object getBean(String beanName) {
+        Object bean = null;
+        String beanPath = props.getProperty(beanName);
+        //01jdbc代码里的class反射
+        try {
+            //通过反射的方式来创建
+            bean = Class.forName(beanPath).newInstance();//每次都调用默认构造函数创建对象
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bean;
+    }*/
+    //在工厂加载的时候，static方法中，所有的对象都已经准备就绪，不需要每次都创建一个实例对象
+    //根据名称获取bean对象
+    public static Object getBean(String beanName) {
+        return beans.get(beanName);
+    }
+}
+~~~
+
+##### ApplicationContext的三个实现类：
+
+- ClassPathXmlApplicationContext:
+
+  可以下载类路径下的配置文件（更常用）
+
+- FileSystemXmlApplicationContext:
+
+  可以加载磁盘任意路径下的配置文件（拥有访问权限）
+
+- AnnotationConfigApplicationContext:
+
+  读取注解创建容器
+
+##### BeanFactory和ApplicationContext的区别
+
+- ApplicationContext:单例对象适用
+
+  构建核心容器的时候，采用立即加载的方式，一读配置文件，对象就被创建出来
+
+- BeanFactory:多例对象使用  
+
+  创建对象采取的策略是延迟加载的方式，什么时候根据id获取对象，什么时候才真正的创建对象
+
+##### Spring对bean的管理细节
+
+- **创建bean的三种方式**
+
+  - ~~~xml
+    <bean id="accountService" class="service.Impl.AccountServiceImpl"></bean>
+    ~~~
+
+    使用*默认构造函数*：在配置文件中使用bean对象，配以id和class属性，且没有其他属性和标签。<font color=ff00ff>如果没有默认构造函数，则对象无法创建</font>
+
+  - ~~~xml
+    <bean id="instanceFactory" class="factory.InstanceFactory"></bean>
+    <bean id="accountService" factory-bean="instanceFactory" factory-method="getAccountService"></bean>	
+  ~~~
+    
+    使用某个类中的方法创建对象（工厂类），并存入Spring中
+    
+  - ~~~xml
+    <bean id="accountService" class="factory.StaticFactory" factory-method="getAccountService"></bean>
+    ~~~
+
+    使用某个类中的静态方法创建对象（工厂类），并存入Spring中
+
+- **bean对象的作用范围**
+
+  bean标签的scope属性：用于指定bean的作用范围
+
+  - singleton：单例的，默认值
+  - prototype：多例的
+  - request：作用于web应用的请求范围
+  - session：作用于web应用的会话范围
+  - global-session：作用于集群环境的会话范围（全局会话范围）  
+
+- **bean对象的生命周期**
+
+  - 单例
+
+    - 出生：当容器创建时对象出生
+    - 活着：只要容器还在，对象一直活着
+    - 死亡：容器销毁，对象消亡
+
+    单例对象生命周期和容器相同
+
+  - 多例
+
+    - 出生：当我们使用对象时创建
+    - 活着：对象只要在使用过程中就一直活着
+    - 死亡：当对象长时间不用且没有别的对象引用时，由Java垃圾回收机制处理
+
+##### 依赖注入
+
+​	Dependency Injection
+
+​	**IOC的作用：**
+
+​		降低程序间的耦合（依赖关系）
+
+​	**依赖关系的管理：**
+
+​		交给Spring来维护：在当前类中需要用到其他类的对象，由Spring为我们提供，我们只需要在配置文件中说明
+
+​	**依赖注入：**
+
+​		*三类数据类型*
+
+- 基本类型和String
+
+- 其他bean类型（在配置文件中或者注解配置的bean）
+
+- 复杂类型/集合类型
+
+  *三种注入方式*
+
+- 构造函数提供
+
+  - 标签：constructor-arg
+
+  - 位置：bean内部
+
+  - 标签中的属性
+
+    - type：用于指定要注入的数据的数据类型，该类型也是构造函数中某个参数的数据类型<font color=ff00ff>如果构造函数有相同的数据类型，则无法单独完成注入</font>
+
+    - index：用于指定注入的数据在构造函数的索引位置，从0开始，<font color=ff00ff>可以独立完成,但是要知道类型</font>
+
+    - <font color=ff0000>name</font>：用于指定给构造函数中指定名称的参数赋值
+
+      ---
+
+    - value：提供基本类型和String类型的数据
+
+    - ref：指定其他的bean类型数据。指的是在Spring的IoC核心容器中出现过的bean对象
+
+  - 优势：
+
+    在获取bean对象时，注入数据是必须的操作，否则无法创建成功
+
+  - 弊端：
+
+    改变了bean对象的实例化方式，使我们在创建时，用不到这些数据也必须提供
+
+- <font color=ff0000>set方式提供</font>
+
+  - 标签：property
+
+  - 位置：bean内部
+
+  - 标签中的属性
+
+    - <font color=ff0000>name</font>：用于指定注入时所调用的<font color=ff00ff>set方法名称</font>
+
+      ![1580714303429](E:\Java\new_Java_Study\daily_notes\pictures\set方法注入的细节.png)
+
+    - value：提供基本类型和String类型的数据
+
+    - ref：指定其他的bean类型数据。指的是在Spring的IoC核心容器中出现过的bean对象
+
+  - 优势：
+
+    创建对象时，没有明确的限制，可以直接使用默认构造函数
+
+  - 弊端：
+
+    如果有某个成员必须有值，则set方法无法保证一定有值
+
+  - **复杂类型注入**（使用set方式）
+
+    - 数组/list集合/set集合：`property`标签内加入`array/list/set`标签
+
+    ~~~xml
+    <bean id="accountServiceComplex" class="service.Impl.AccountServiceImplComplex">
+            <property name="myStrs">
+                <array>
+                    <value>AAA</value>
+                    <value>BBB</value>
+                    <value>CCC</value>
+                </array>
+            </property>
+        </bean>
+    ~~~
+
+    - Map集合/properties：`property`标签内加入`map/props`标签
+
+    ~~~xml
+    <property name="myMap">
+                <map>
+                    <entry key="testA" value="AAA"></entry>
+                    <entry key="testB">
+                        <value>BBB</value>
+                    </entry>
+                </map>
+            </property>
+    ~~~
+
+    ~~~xml
+    <property name="myMap">
+                <props>
+                    <prop key="testC">CCC</prop>
+                    <prop key="testD">DDD</prop>
+                </props>
+            </property>
+    ~~~
+
+    > <font color=ff0000>结构相同，标签可以互换</font>
+
+- 使用注解提供
+
+> ```
+> 如果是经常变化的数据，并不适合注入的方式
+> ```
+
+**Spring对Date数据类型的注入的支持**
+
+![1580712844714](E:\Java\new_Java_Study\daily_notes\pictures\Spring对Date数据类型注入的支持.png)
+
+---
 
 ----
 
