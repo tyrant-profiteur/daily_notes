@@ -1,3 +1,5 @@
+
+
 # Spring
 
 #### 程序的耦合
@@ -119,7 +121,9 @@ public class BeanFactory {
 
 - ApplicationContext:单例对象适用
 
-  构建核心容器的时候，采用立即加载的方式，一读配置文件，对象就被创建出来
+  构建核心容器的时候，<font color=ff0000>采用立即加载的方式</font>，一读配置文件，对象就被创建出来
+
+  > <font color=ff00ff>在使用注解创建对象时，`ApplicationContext ac = new ClassPathXmlApplicationContext("bean.xml")`读取xml文件就创建对象，但是基于注解配置，bean.xml里是没有对象的，虽然在类上使用了`@Component`注解，但是Spring并不知道注解在哪里，需要有行配置告知Spring在创建容器时要扫描的包，配置所需要的标签不是在`<beans></beans>`下</font>
 
 - BeanFactory:多例对象使用  
 
@@ -138,16 +142,16 @@ public class BeanFactory {
   - ~~~xml
     <bean id="instanceFactory" class="factory.InstanceFactory"></bean>
     <bean id="accountService" factory-bean="instanceFactory" factory-method="getAccountService"></bean>	
-  ~~~
+    ~~~
     
     使用某个类中的方法创建对象（工厂类），并存入Spring中
     
   - ~~~xml
     <bean id="accountService" class="factory.StaticFactory" factory-method="getAccountService"></bean>
     ~~~
-
+  
     使用某个类中的静态方法创建对象（工厂类），并存入Spring中
-
+  
 - **bean对象的作用范围**
 
   bean标签的scope属性：用于指定bean的作用范围
@@ -299,6 +303,206 @@ public class BeanFactory {
 **Spring对Date数据类型的注入的支持**
 
 ![1580712844714](E:\Java\new_Java_Study\daily_notes\pictures\Spring对Date数据类型注入的支持.png)
+
+##### 基于注解的 Spring
+
+- 曾今的 xml 配置
+
+  ~~~xml
+  <bean id="accountService" class="service.Impl.AccountServiceImpl" scope="" init-method="" destory-method="">
+  <property name="" value="" ref=""></property>
+  </bean>
+  ~~~
+
+- 基于注解的
+
+  <font color=ff0000>需要告知Spring在创建容器时要扫描的包，配置所需要的标签不是在`<beans></beans>`约束中，而是一个叫`context`的约束中</font>
+
+  1. 导入注解所需要的bean.xml配置([Spring的core](E:\Java\books\黑马JAVA\00.讲义+笔记+资料\3.主流框架\32.会员版(2.0)-就业课(2.0)-Spring\spring_day01\资料\spring-framework-5.0.2.RELEASE-dist\spring-framework-5.0.2.RELEASE\docs\spring-framework-reference\core.html))
+  2. <beans></beans>中使用context标签
+  
+  ~~~xml
+  <context:component-scan base-package="java"></context:component-scan>
+  ~~~
+  
+  - 创建对象的
+  
+    |      xml      |    注解     |
+    | :-----------: | :---------: |
+    | <bean></bean> | @Component  |
+    |               | @Controller |
+    |               |  @Service   |
+    |               | @Repository |
+    
+    - @Component作用
+    
+      - 作用：把当前类存入Spring容器中
+    
+      - 属性：value：用于指定bean的id，当我们不写时，默认值为当前类型，首字母小写
+    
+        ~~~xml
+        @Component(value=""),如果只有一个value属性时，可以省略写成@Component("")
+        ~~~
+    
+    - @Controller    @Service    @Repository作用
+    
+      - 作用：和@Component一样，Spring提供的明确的三层使用的注解，使三层对象更加清晰
+      - @Controller：表现层
+      - @Service：应用层
+      - @Repository：持久层
+    
+  - 注入数据的
+  
+    |                xml                 |    注解    |
+    | :--------------------------------: | :--------: |
+    | <bean><property></property></bean> | @Autowired |
+    |                                    | @Qualifier |
+    |                                    | @Resource  |
+    |                                    |   @Value   |
+  
+    - @Autowired
+      - 作用：自动按照类型注入。
+      
+        ①只要容器中有<font color=ff00ff>唯一一个</font>bean对象类型和要注入的变量类型匹配，就可以注入成功；
+      
+        ![1581139663879](E:\Java\new_Java_Study\daily_notes\pictures\Autowired唯一匹配自动注入.png)
+      
+        ②如果没有匹配类型，则报错；
+      
+        ③如果有多个匹配时，先匹配类型，再根据变量名称进行匹配
+      
+        ![1581142000546](E:\Java\new_Java_Study\daily_notes\pictures\Autowired多个类型自动注入.png)
+      
+      - 出现位置：①变量上，②方法上
+      
+      - 细节：在使用注解注入时，set方法就不是必须的了
+      
+    - @Qualifier
+  
+      - 作用：在按照类注入的基础上，再按照名称注入。在给类成员注入时不能单独使用，但是给方法参数注入时可以
+  
+      - 属性：value：指定注入bean的id
+  
+      - 如果一个对象有多个实现类，且在方法参数要使用时，可以使用该注解定义对应的Bean对象
+  
+        ![1581253094794](E:\Java\new_Java_Study\daily_notes\pictures\@Qualifier单独使用方法.png)
+  
+    - @Resource
+  
+      - 作用：直接按照bean的id注入，可以单独使用
+      - 属性：name：用于指定dean的id
+  
+    <font color=ff0000>注：</font>以上三种注入只能注入其他bean类型数据，基本类型和String类型无法使用上述注解实现。
+  
+    ​		另外，集合类型的注入只能通过 xml 来实现
+  
+    - @Value
+  
+      - 作用：用于注入基本类型和String类型的数据
+  
+      - 属性：value：用于指定数据的值。可以使用 Spring 的 spEL (Spring 的EL表达式)
+  
+        > spEL 的写法：${表达式}
+  
+  - 改变作用范围的
+  
+    |          xml           |  注解  |
+    | :--------------------: | :----: |
+    | <bean scope=""></bean> | @Scope |
+  
+    - @Scope
+      - 作用：改变bean的作用范围
+      - 属性：value：指定范围的取值。常用：singleton，prototype
+  
+  - 生命周期相关的
+  
+    |               xml               |      注解      |
+    | :-----------------------------: | :------------: |
+    |  <bean init-method=""></bean>   | @PostConstruct |
+    | <bean destory-method=""></bean> |  @PreDestroy   |
+
+##### Spring的新注解
+
+​	以上学习，即使基于注解，xml配置文件依旧存在，如告知要扫描的包，配置数据库，要用到jar包中的类时，一就要使用xml来配置，解决以上问题，使用Spring新注解
+
+<font color=ff0000>**注：**</font>在不使用xml配置时，获取容器不能再使用`ApplicationContext ac = new ClassPathXmlApplicationContext("bean.xml")`,而是使用`ApplicationContext ac = new AnnotationConfigApplicationContext(SpringConfiguration.class)`
+
+- @Configuration
+
+  - 作用：指定当前类是一个配置类，替换 bean.xml
+  - 细节：当配置类作为`AnnotationConfigurationApplicationContext`对象参数创建时，该注解可以不写
+
+- @ComponentScan
+
+  - 作用：用于通过注解来指定spring在创建容器时要扫描的包
+
+  - 属性：value：它和basePackages的作用是一样的，都是用于指定创建容器时要扫描的包，使用此注解等同于在bean.xml配置了`<context:component-scan base-package="project"></context:component-scan>`
+
+    ![1581231890818](E:\Java\new_Java_Study\daily_notes\pictures\@Configuration和@ComponentScan注解的作用.png)
+
+- @Bean
+
+  - 作用：把当前方法的返回值作为Bean存入Spring容器中
+
+  - 属性：name：用于指定bean的id，不写时，默认值是当前方法的名称
+
+  - 细节：当我们使用注解配置方法时，如果方法有参数，Spring框架会去容器中查找有没有可用的bean对象。查找方式和@Autowired一样
+
+    ![1581233406069](E:\Java\new_Java_Study\daily_notes\pictures\@Bean注解的使用.png)
+
+- @Import
+  - 作用：用于导入其他的配置类
+  - 属性：value：用于指定其他配置类的字节码。当使用该注解之后，有@Import注解的类就是父配置类，导入的就是子配置类，子配置类不需要再用@Configuration注解配置
+  
+- @PropertySource
+
+  - 作用：用于指定properties文件的位置
+
+  - 属性：value：指定文件的名称和路径
+
+    ​						关键字：classpath：表示类路径下
+
+  - 相当于 xml 的`<context:property-placeholder location=""/>`标签
+
+  **配置类注解的细节**
+
+  ![1581250718407](E:\Java\new_Java_Study\daily_notes\pictures\Spring新注解详解.png)
+
+##### Spring整合Junit
+
+- 分析：
+
+> 1、应用程序的入口
+> 	main方法
+> 2、junit单元测试中，没有main方法也能执行
+> 	junit集成了一个main方法
+> 	该方法就会判断当前测试类中哪些方法有 @Test注解
+> 	junit就让有Test注解的方法执行
+> 3、junit不会管我们是否采用spring框架
+> 	在执行测试方法时，junit根本不知道我们是不是使用了spring框架
+> 	所以也就不会为我们读取配置文件/配置类创建spring核心容器
+> 4、由以上三点可知
+> 	当测试方法执行时，没有Ioc容器，就算写了Autowired注解，也无法实现注入
+
+- 步骤
+
+  1. 导入spring整合junit的jar(坐标)
+
+  2. 使用Junit提供的一个注解把原有的main方法替换了，替换成spring提供的@Runwith
+
+     `@RunWith(SpringJUnit4ClassRunner.class)`
+
+  3. 告知spring的运行器，spring和ioc创建是基于xml还是注解的，并且说明位置@ContextConfiguration
+
+     - locations：指定xml文件的位置，加上classpath关键字，表示在类路径下
+
+       `@ContextConfiguration(locations = "classpath:bean.xml")`
+
+     - classes：指定注解类所在地位置
+
+       `@ContextConfiguration(classes = SpringConfiguration.class)`
+
+  > 当我们使用spring 5.x版本的时候，要求junit的jar必须是4.12及以上
 
 ---
 
