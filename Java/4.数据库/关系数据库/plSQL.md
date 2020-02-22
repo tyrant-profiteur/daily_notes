@@ -1,5 +1,3 @@
-# SQL
-
 ## Oracle
 
 ## 1.to_char,to_number,to_date
