@@ -30,7 +30,7 @@ get，如果发现这个位置挂了一个链表，遍历链表，找到自己�
 
 如果链表长度太大，遍历花费时间会很长O(n)
 
-优化：如果链表长度达到一定的长度（拉链度：8），就会将链表转化为红黑树，时间复杂度O(logn)
+优化：如果链表长度达到一定的长度（拉链度：8），就 会将链表转化为红黑树，时间复杂度O(logn)
 
 **hashMap扩容**
 
@@ -245,7 +245,7 @@ new ArrayBlockingQueue<Runnable>(200)
 
 一般常用的：
 
-- fixed，不创建新的线程，队列无限
+- fixed，不创建新的线程，队列无限，使用的相对多一点 
 - 队列有限，满了之后创建新的线程无线
 
 **线程池中使用无界阻塞队列会怎样**
@@ -256,3 +256,156 @@ new ArrayBlockingQueue<Runnable>(200)
 
 **线程池中的队列满了之后，会发生什么**
 
+有界队列，可以避免内存溢出。
+
+corePoolSize:3
+
+maximumPoolSize:Integer.MAX_VALUE
+
+new ArrayBlockingQueue<Runnable>(200)
+
+假设可以不停创建线程，队列满了，新的任务进来，线程一直创建。每个线程都有自己的栈内存，会导致资源耗尽或者cpu load 负载高
+
+无限队列和无线线程都可能会有内存溢出问题，可以根据自己的实际情况，自定义reject策略
+
+> 如果线程池无法执行更多的任务了，此时建议你可以b把这个任务持久化写入磁盘，后台专门启动一个线程，后续等线程池的工作负载低了，它可以慢慢从磁盘读取之前持久化的任务，重新提交到线程池里去执行
+
+**线上机器突然宕机，线程池阻塞队列中的请求怎么办**
+
+宕机，线程池里的积压的任务实际上必然丢失的
+
+如果说提交一个任务，提交前，现在数据库里插入任务的信息，更新他的状态：未提交，已提交，已完成。提交成功后更新他的状态为已提交。
+
+系统重启，后台线程去扫描数据库里的信息，读取出来重新提交，继续执行
+
+
+
+#### JVM
+
+**java内存模型的理解**
+
+read,load,use,assign,store,write
+
+```
+public Class HelloWorld{
+	private int i;
+	public void intcrement(){
+		i++;
+	}
+}
+
+HelloWorld h = new HelloWorld();
+//线程1
+new Thread(){
+	new run(){
+		h.intcrement();
+	}
+}.start;
+//线程2
+new Thread(){
+	new run(){
+		h.intcrement();
+	}
+}.start;
+```
+
+
+
+![1584149271232](E:\Java\new_Java_Study\daily_notes\pictures\interviews\data++内存模型.png)
+
+**java内存模型的原子性、有序性、可见性**
+
+连环泡：java内存模型->原子性、有序性、可见性->volatile->happens-before/内存屏障
+
+可见性：
+
+~~~
+new Thread(){
+	public void run(){
+	data++;
+	}
+}.start();
+
+new Thread(){
+	public void run(){
+	while(data == 0)
+		Thread.sleep(1000); 
+	}
+}.start();
+~~~
+
+![1584193375105](E:\Java\new_Java_Study\daily_notes\pictures\interviews\可见性内存模型.png)
+
+没有可见性：线程1已经更新了，但是线程2之前读取了data存在工作内存中，之后主内存已经更新了，但是线程2没有读取到，依旧在while循环里，这就是不可见。
+
+可见性：线程1更新之后，强制要求线程2读取新的值
+
+原子性：
+
+线程1执行完了read、load、use、assign、store、write之后，线程2 才能执行。
+
+data++必须独立执行，没有人影响我，一定是我自己执行成功之后，别人才能接着执行。
+
+有序性：
+
+~~~
+flag = flase;
+//线程1 
+prepare();
+flag=true;
+//线程2
+while(!flag){
+	Thread.sleep(1000);
+}
+execute();//基于准备的资源执行操作
+~~~
+
+ 有时候为了提高代码执行效率，会出现指令重排序，导致代码可能会出现一些问题。
+
+有序性：代码不会发生重排。
+
+**从java底层聊聊volatile关键字的原理**
+
+volatile关键字是用来解决可见性和有序性，在有些罕见的条件下，可以有限的保证有限性，保证原子性。
+
+~~~
+private volatile int data = 0;
+new Thread(){
+	public void run(){
+	data++;
+	}
+}.start();
+
+new Thread(){
+	public void run(){
+	while(data == 0)
+		Thread.sleep(1000); 
+	}
+}.start();
+~~~
+
+刷到主内存的同时，会将线程2的工作内存的data失效，下次线程2会重新从主内存里加载值。
+
+很多的开源中间件的源码大量使用了volatile。
+
+开源中间件，大数据系统，都多线程并发，volatile
+
+~~~
+public class Kafka{
+	pirvate volatile boolean running = true;
+	//他是一个接口
+	public void shutdown(){
+	//关闭这个系统，有个shutdown.sh脚本，来调用这个shutdown接口
+		running = false；
+	}
+	public static void main(){
+		//启动kafka，rockemeq，会有一大堆的代码，中间件系统，不能直接退出
+		Kafka kafka = new Kafka();
+		while(kafka.running){
+			Thread.sleep(1000);
+		}
+	}
+}
+~~~
+
+主要作用：有线程更新data，有线程读，能够保证可见性

@@ -68,3 +68,12 @@ pull ≈ fetch + merge，fetch并不会自动合并或修改当前的工作，�
 - **git add -u**  提交被修改(modified)和被删除(deleted)文件，不包括新文件(new)
 - **git add -A**  提交所有变化
 
+.**gitignore 不起作用问题**
+
+git忽略目录中，新建的文件在git中会有缓存，如果某些文件已经被纳入了版本管理中，就算是在.gitignore中已经声明了忽略路径也是不起作用的，这时候我们就应该先把本地缓存删除，然后再进行git的push，这样就不会出现忽略的文件了。git清除本地缓存命令如下：
+
+```
+git ``rm` `-r --cached .
+git add .
+```
+
