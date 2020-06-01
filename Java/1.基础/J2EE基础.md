@@ -109,7 +109,7 @@
 
   将取值范围小的类型自动提升为取值范围大的类型
 
-  ![1579093176306](E:\Java\new_Java_Study\daily_notes\pictures\自动类型转换示意图.png)
+  ![1579093176306](.\..\..\pictures\自动类型转换示意图.png)
 
   **转换规则：**
 
@@ -119,8 +119,9 @@
 
   将取值范围大的类型强制转换为取值范围小的类型
 
-  ![1579437664316](E:\Java\new_Java_Study\daily_notes\pictures\强制类型转换示意图.png)
+  ![1579437664316](.\..\..\pictures\Java\J2EE\强制类型转换示意图.png)
     <font color='ff0000'>注：</font>
+
   - 浮点转为整数，直接取消小数点，会造成数据损失精度
   - int 强制转为 short，砍掉两个字节，会造成数据丢失
 
@@ -209,7 +210,7 @@
 >
 > JVM 可以理解的代码叫做字节码（.class 文件），只面向虚拟机。Java 通过字节码方式，在解决了传统解释型语言执行效率低问题的同时，又保留了解释性语言的可移植性。
 
-![Java程序运行过程](E:\Java\new_Java_Study\daily_notes\pictures\Java 程序运行过程.png)
+![Java程序运行过程](.\..\..\pictures\Java\J2EE\Java 程序运行过程.png)
 
 .class 文件->机器码这步，JVM类加载器加载字节码文件，解释器进行逐行解释执行，但是有些代码会被经常性调用(热点代码[^hotSpot])，后来引进了JIT编译器(运行时编译)。当JIT完成第一次编译，会将字节码对应的机器码保存下来，下次可以直接使用。Java是编译与解释共存的语言的原因。
 
@@ -255,7 +256,7 @@ JDK>JRE>JVM
 | **内存大小** |                   2个字节                    |                若干个字节                |
 
 
-![img](E:\Java\new_Java_Study\daily_notes\pictures\类型所占存储空间.jpg)
+![img](.\..\..\pictures\Java\J2EE\类型所占存储空间.jpg)
 
 ##### 重载(overload)和重写(override)
 
@@ -337,7 +338,7 @@ JDK>JRE>JVM
 
 ​	构造方法主要是完成对类对象的初始化工作。Java在执行<font color=ff00ff>子类构造方法</font><font color=ff00>之前</font>，如果没有`super()`调用父类特定的方法，则会调用<font color=ff00ff>父类没有参数的构造方法</font>帮助子类做初始化工作,如果不定义而子类构造方法有没有 super() 来调用父类特定的构造方法，则编译发生错误。
 
-![](E:\Git\daily_notes\pictures\父类中无参构造的作用.jpg)
+![](.\..\..\pictures\Java\J2EE\父类中无参构造的作用.jpg)
 
 > 构造方法特征：
 >

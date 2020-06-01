@@ -44,7 +44,7 @@
    2. 调用方法
    3. 来~跑起来，嘟驾~
 
-   ![1581656701280](E:\Java\new_Java_Study\daily_notes\pictures\Spring\Spring整合Junit报错.png)😱为什么。。`java.lang.NullPointerException`。。。看下报错信息，嗯，看不懂，再瞅瞅，有认识的了，`SpringJunit4ClassRunner`，这不就是我整合时候修改的 main 方法嘛，Spring提供的。
+   ![1581656701280](.\..\pictures\articles\Spring整合Junit报错.png)😱为什么。。`java.lang.NullPointerException`。。。看下报错信息，嗯，看不懂，再瞅瞅，有认识的了，`SpringJunit4ClassRunner`，这不就是我整合时候修改的 main 方法嘛，Spring提供的。
 
    再想想Spring核心——IoC,AOP。还没有AOP的事儿啊，那就是容器了。难道我调用了Spring，就不能new对象了？再试试。。
 

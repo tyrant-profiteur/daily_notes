@@ -240,7 +240,7 @@ public class BeanFactory {
 
     - <font color=ff0000>name</font>：用于指定注入时所调用的<font color=ff00ff>set方法名称</font>
 
-      ![1580714303429](E:\Java\new_Java_Study\daily_notes\pictures\Spring\set方法注入的细节.png)
+      ![1580714303429](.\..\..\..\pictures\Java\Spring\set方法注入的细节.png)
 
     - value：提供基本类型和String类型的数据
 
@@ -302,7 +302,7 @@ public class BeanFactory {
 
 **Spring对Date数据类型的注入的支持**
 
-![1580712844714](E:\Java\new_Java_Study\daily_notes\pictures\Spring\Spring对Date数据类型注入的支持.png)
+![1580712844714](.\..\..\..\pictures\Java\Spring\Spring对Date数据类型注入的支持.png)
 
 ##### 基于注解的 Spring
 
@@ -365,13 +365,13 @@ public class BeanFactory {
       
         ①只要容器中有<font color=ff00ff>唯一一个</font>bean对象类型和要注入的变量类型匹配，就可以注入成功；
       
-        ![1581139663879](E:\Java\new_Java_Study\daily_notes\pictures\Spring\Autowired唯一匹配自动注入.png)
+        ![1581139663879](.\..\..\..\pictures\Java\Spring\Autowired唯一匹配自动注入.png)
       
         ②如果没有匹配类型，则报错；
       
         ③如果有多个匹配时，先匹配类型，再根据变量名称进行匹配
       
-        ![1581142000546](E:\Java\new_Java_Study\daily_notes\pictures\Spring\Autowired多个类型自动注入.png)
+        ![1581142000546](.\..\..\..\pictures\Java\Spring\Autowired多个类型自动注入.png)
       
       - 出现位置：①变量上，②方法上
       
@@ -385,7 +385,7 @@ public class BeanFactory {
   
       - 如果一个对象有多个实现类，且在方法参数要使用时，可以使用该注解定义对应的Bean对象
   
-        ![1581253094794](E:\Java\new_Java_Study\daily_notes\pictures\Spring\@Qualifier单独使用方法.png)
+        ![1581253094794](.\..\..\..\pictures\Java\Spring\@Qualifier单独使用方法.png)
   
     - @Resource
   
@@ -438,7 +438,7 @@ public class BeanFactory {
 
   - 属性：value：它和basePackages的作用是一样的，都是用于指定创建容器时要扫描的包，使用此注解等同于在bean.xml配置了`<context:component-scan base-package="project"></context:component-scan>`
 
-    ![1581231890818](E:\Java\new_Java_Study\daily_notes\pictures\Spring\@Configuration和@ComponentScan注解的作用.png)
+    ![1581231890818](.\..\..\..\pictures\Java\Spring\@Configuration和@ComponentScan注解的作用.png)
 
 - @Bean
 
@@ -448,7 +448,7 @@ public class BeanFactory {
 
   - 细节：当我们使用注解配置方法时，如果方法有参数，Spring框架会去容器中查找有没有可用的bean对象。查找方式和@Autowired一样
 
-    ![1581233406069](E:\Java\new_Java_Study\daily_notes\pictures\Spring\@Bean注解的使用.png)
+    ![1581233406069](.\..\..\..\pictures\Java\Spring\@Bean注解的使用.png)
 
 - @Import
   - 作用：用于导入其他的配置类
@@ -466,7 +466,7 @@ public class BeanFactory {
 
   **配置类注解的细节**
 
-  ![1581250718407](E:\Java\new_Java_Study\daily_notes\pictures\Spring\Spring新注解详解.png)
+  ![1581250718407](.\..\..\..\pictures\Java\Spring\Spring新注解详解.png)
 
 ##### Spring整合Junit
 
@@ -510,7 +510,7 @@ public class BeanFactory {
 
 <font color = ff00ff>	事务控制应该都是在<font color=ff0000>业务层</font>而不是持久层</font>
 
-![1581306054741](E:\Java\new_Java_Study\daily_notes\pictures\Spring\Spring事务控制原因.png)
+![1581306054741](.\..\..\..\pictures\Java\Spring\Spring事务控制原因.png)
 
 - 无事务控制时，每个连接都有一个自己的事务，每个成功执行了就提交事务，如果报错了，下面的代码就不执行。
 - 解决方法：<font color=ff0000>使用`ThreadLocal`对象把`Connection`和当前`线程`绑定,</font>从而使一个线程中只有一个能控制事务的对象
@@ -591,7 +591,7 @@ public class BeanFactory {
 
 #### 代理模式图解
 
-![1581589529356](E:\Java\new_Java_Study\daily_notes\pictures\Spring\代理模式图解.png)
+![1581589529356](.\..\..\..\pictures\Java\Spring\代理模式图解.png)
 
 1. 用户只关心接口功能，而不在乎谁提供了功能。上图中接口是 Subject。
 2. 接口真正实现者是上图的 RealSubject，但是它不与用户直接接触，而是通过代理。
@@ -600,7 +600,7 @@ public class BeanFactory {
 
 #### AOP
 
-![1581665535568](E:\Java\new_Java_Study\daily_notes\pictures\Spring\AOP.png)
+![1581665535568](.\..\..\..\pictures\Java\Spring\AOP.png)
 
 - 作用： 在程序运行期间，不修改源码对已有方法进行增强。 
 - 优势： 
@@ -635,7 +635,7 @@ public class BeanFactory {
 
   - 通知的类型：前置通知,后置通知,异常通知,最终通知,环绕通知。
 
-![](E:\Java\new_Java_Study\daily_notes\pictures\Spring\通知的类型.jpg)
+![](.\..\..\..\pictures\Java\Spring\通知的类型.jpg)
 
 - Introduction(引介): 
 
@@ -828,13 +828,13 @@ public class BeanFactory {
   
   <font color=ff0000>注解配置AOP控制事务注意：</font>
   
-  ![](E:\Java\new_Java_Study\daily_notes\pictures\Spring\注解AOP控制事务的问题分析.png)
+  ![](.\..\..\..\pictures\Java\Spring\注解AOP控制事务的问题分析.png)
   
   先执行最终通知，再执行后置/异常通知，导致线程和连接先解绑后，再提交事务，此时的事务时提交不上去的。
 
 #### JdbcTemplate
 
-![](E:\Java\new_Java_Study\daily_notes\pictures\Spring\持久层总图.jpg)
+![](.\..\..\..\pictures\Java\Spring\持久层总图.jpg)
 
 - 作用：用户和数据库交互的，实现对表的CRUD操作
 
@@ -858,7 +858,7 @@ public class BeanFactory {
 
 - 和queryRunner的区别：
 
-  ![](E:\Java\new_Java_Study\daily_notes\pictures\Spring\jdbctemplate和queryrunner的区别.png)
+  ![](.\..\..\..\pictures\Java\Spring\jdbctemplate和queryrunner的区别.png)
 
   JdbcTemplate中的封装策略：new AccountRowMapper(),常用其实现子类：BeanPropertyRowMapper<>()
 

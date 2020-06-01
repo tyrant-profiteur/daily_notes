@@ -311,7 +311,7 @@ new Thread(){
 
 
 
-![1584149271232](E:\Java\new_Java_Study\daily_notes\pictures\interviews\data++内存模型.png)
+![1584149271232](.\..\pictures\interviews\data++内存模型.png)
 
 **java内存模型的原子性、有序性、可见性**
 
@@ -334,7 +334,7 @@ new Thread(){
 }.start();
 ~~~
 
-![1584193375105](E:\Java\new_Java_Study\daily_notes\pictures\interviews\可见性内存模型.png)
+![1584193375105](.\..\pictures\interviews\可见性内存模型.png)
 
 没有可见性：线程1已经更新了，但是线程2之前读取了data存在工作内存中，之后主内存已经更新了，但是线程2没有读取到，依旧在while循环里，这就是不可见。
 
