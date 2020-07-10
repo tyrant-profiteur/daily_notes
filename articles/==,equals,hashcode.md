@@ -1,8 +1,6 @@
-大纲
+## 1.1 ==，equals，hashCode介绍
 
-1.1 ==，equals，hashCode介绍
-
-- ==：比较栈内存中的值
+- ### ==：比较栈内存中的值
 
   - 基本数据类型比较的就是自己的值
 
@@ -10,7 +8,9 @@
   ![==比较的值](.\..\pictures\articles\==，equals,hashcode\==比较的值.png)
 
 
-- equals：Object 类的方法
+- ### equals：Object 类的方法
+
+  <a name="equals Object类源码">equals Object类源码</a>
 
   ~~~java
   public class Object {
@@ -23,15 +23,15 @@
   ~~~
 
   ​        通过以上源码我们可以看到 Object 类的 equals 方法的作用和 == 相等，它提供了<font color = ff00ff>最具辨别力的可能等价关系</font>，及比较地址值，<font color=00aaff>判断是否为同一个对象</font>。但是要比较具体的值也就是堆存储的值，就需要重写 equals(比如 String 类，[String-equals源码](#String-equals 源码)附在文底) 
-  
+
   equals 也对非空对象提供了五个等价关系：
-  
+
   1. 自反性：`x.equals(x) `-> true
   2. 对称性：`x.equals(y)` <-> `y.equals(x)`
   3. 可传递性：`x.equals(y)`,`y.equals(z)` -> `x.equals(z)`
   4. 一致性：如果比较值没有修改过，无论执行多少次操作，`x.equals(y)`的值都不会改变
   5. `x.equals(null)` -> false
-  
+
   > 值得一提的是，无论 equals 方法是否重写，通常都需要对 hashcode 方法进行重写，这样才能够保证 equals 和 hashcode 的[通用约定](#通用约定)（该约定在下文 hashcode 中介绍），主要是保证 equals 相等的值拥有相同的 hashcode
 
 - hashcode：系统本地方法，非java 语言实现,返回对象的 hash 值
@@ -52,30 +52,212 @@
 
   > 在实现 hashcode 方法时，尽可能保证不同的对象返回不同的 hash 值，但不是必须的
 
-1.2 比较类型
+## 1.2 比较类型
 
-- A: ==	
+### 比较的类
 
-- - a: 基本数据类型
-  - b: 引用类型（User 类）
+- <a name="User">User 类</a>
 
-- B: equals
+  ~~~java
+  public class User implements Cloneable{
+      private String name;
+      private String age;
+  
+      public User() {}
+  
+      public User(String name, String age) {
+          this.name = name;
+          this.age = age;
+      }
+  
+      public String getName() {
+          return name;
+      }
+  
+      public void setName(String name) {
+          this.name = name;
+      }
+  
+      public String getAge() {
+          return age;
+      }
+  
+      public void setAge(String age) {
+          this.age = age;
+      }
+  }
+  ~~~
 
-- - a: 不重写（User 类）
-  - b: 重写（UserOverride 类）
+- <a name="UserOverride">UseOverride 类</a>--重写了 equals 和 hashcode
 
-- C: hashCode
+  ~~~java
+  public class UserOverride implements Cloneable{
+      private String name;
+      private String age;
+  
+      public UserOverride() {}
+  
+      public UserOverride(String name, String age) {
+          this.name = name;
+          this.age = age;
+      }
+  
+      public String getName() {
+          return name;
+      }
+  
+      public void setName(String name) {
+          this.name = name;
+      }
+  
+      public String getAge() {
+          return age;
+      }
+  
+      public void setAge(String age) {
+          this.age = age;
+      }
+  
+      @Override
+      public boolean equals(Object o) {
+          if (this == o) return true;
+          if (o == null || getClass() != o.getClass()) return false;
+          UserOverride userOverride = (UserOverride) o;
+          return Objects.equals(name, userOverride.name) &&
+                  Objects.equals(age, userOverride.age);
+      }
+  
+      @Override
+      public int hashCode() {
+          return Objects.hash(name, age);
+      }
+  }
+  ~~~
 
-- - a: 不重写（User 类）
-  - b: 重写（UserOverride 类）
+- Objects.equals
 
-1.3 比较方案
+  ~~~java
+  public final class Objects {
+      public static boolean equals(Object a, Object b) {
+          return (a == b) || (a != null && a.equals(b));
+      }
+  }
+  ~~~
 
-- == 自比较
-- equals 自比较
-- hashCode 自比较
-- ==，equals（2*3 种）
-- equals，hashcode（2*2*3 种）
+- ### A: ==	
+
+- - #### a: 基本数据类型
+  
+  ~~~java
+    public class MainFunction {
+        public static void main(String[] args){
+            //基本类型
+            int a = 1,b = 1,c = 2;
+            System.out.println(a == b);//true
+            System.out.println(a == c);//false
+        }
+    }
+    ~~~
+  
+  - #### b: 引用类型（[User 类](#User)）
+  
+    ~~~java
+    public class MainFunction {
+        public static void main(String[] args){
+            //引用类型
+            //无参构造
+            User user = new User();
+            user.setName("老王");
+            user.setAge("24");
+            User user1 = new User();
+            user1.setName("老王");
+            user1.setAge("24");
+            User user2 = user;
+            //有参构造
+            User user3 = new User("老王","24");
+            System.out.println(user == user1);//false
+            System.out.println(user == user2);//true
+            System.out.println(user == user3);//false
+        }
+    }
+    ~~~
+  
+    ![image-20200710165443533](.\..\pictures\articles\==，equals,hashcode\User类==比较.png)
+  
+    不管是有参还是无参构造方法，new 出来对象总会在堆中重新创建一个对象出来，栈中存相关的地址，== 比较的为地址值，所以 user，user1，user3 使用 == 比较的结果都为 false；
+  
+    user2 直接通过 = 赋值，即将 user 栈中存的地址值赋给 user2，user2指向 user 在堆中的对象，因为 == 比较的为栈中的值，所以 user 和 user2 使用 == 比较的结果为 ture；
+  
+- ### B: equals
+
+- - #### a: 不重写（[User 类](#User)）
+  
+  因为不重写 equals 方法，使用的是 [Object 类的 equals 方法](#equals Object类源码)，预期结果和 == 比较相等
+  
+    ~~~java
+    public class MainFunction1 {
+        public static void main(String[] args){
+            //引用类型
+            //无参构造
+            User user = new User();
+            user.setName("老王");
+            user.setAge("24");
+            User user1 = new User();
+            user1.setName("老王");
+            user1.setAge("24");
+            User user2 = user;
+            //有参构造
+            User user3 = new User("老王","24");
+            System.out.println(user.equals(user1));//false
+            System.out.println(user.equals(user2));//true
+            System.out.println(user.equals(user3));//false
+        }
+    }
+    ~~~
+  
+    实测结果和预期是一样的
+  
+  - #### b: 重写（[UserOverride 类](#UserOverride)）
+  
+    ~~~java
+    public class MainFunction1 {
+        public static void main(String[] args){
+            //引用类型
+            //无参构造
+            UserOverride user = new UserOverride();
+            user.setName("老王");
+            user.setAge("24");
+            UserOverride user1 = new UserOverride();
+            user1.setName("老王");
+            user1.setAge("24");
+            UserOverride user4 = new UserOverride();
+            user4.setName("老王");
+            user4.setAge("20");
+            UserOverride user2 = user;
+            //有参构造
+            UserOverride user3 = new UserOverride("老王","24");
+            System.out.println(user.equals(user1));//true
+            System.out.println(user.equals(user2));//true
+            System.out.println(user.equals(user3));//true
+            System.out.println(user.equals(user4));//false
+        }
+    }
+    ~~~
+  
+    因为重写了 equals 方法，根据重写的比较方案，比较的为具体的值而不是地址值，所以之间的相互比较都为 true
+  
+- ### C: hashCode
+
+- - #### a: 不重写（User 类）
+  - #### b: 重写（UserOverride 类）
+
+## 1.3 比较方案
+
+- ### == 自比较
+- ### equals 自比较
+- ### hashCode 自比较
+- ### ==，equals（2*3 种）
+- ### equals，hashcode（2*2*3 种）
 
 > 注：2--重写不重写；3--对象创建：=赋值，new，clone
 
