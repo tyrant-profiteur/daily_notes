@@ -1,4 +1,4 @@
-## 快速入门
+## 网络编程快速入门
 
 ### 1. 什么是网络编程
 
@@ -224,3 +224,148 @@ UDP 数据包括目的端口号和源端口号信息
 ### 11. 传输协议
 
 > 约定大于配置，在网络传输中依然适用；网络地传输流程是健壮的，稳定的，得益于基础的协议构成
+
+### 12. Mac 地址
+
+> Media Access Control 或者 Medium Access Control
+>
+> 媒体访问控制，或者物理地址、硬件地址；用来定义网络设备的地址
+
+### 13. IP 地址
+
+> 或联网协议地址（Internet Protocol Address，网际协议地址）
+>
+> 是分配给网络上使用网际协议的设备的数字标签
+>
+> 常见为 IPv4 和 IPv6
+
+- IPv4
+  - 由 32 位二进制数组成
+  - 分为 A、B、C、D、E 五大类，E 属于特殊保留地址
+  - 1.1.1.1 为直接广播地址（会被因特网拦截）；255.255.255.255 为局域网广播地址
+- IPv6
+  - 总长128位，采用 32 个十六进制数
+  - 一个 64 位的网络前缀和一个 64 位的主机地址，主机地址通常根据物理地址自动生成，叫做 EUI-64（64 位扩展唯一标志）
+
+### 14. 端口
+
+- 计算机之间依照互联网传输层 TCP/IP 协议的协议通信，不同的协议对应不同的端口
+- 49152 到 65525 端口属于“动态端口”范围，没有端口可以被正式注册占用
+
+![1594641498126](./..\..\pictures\Java\socket\端口-特殊端口1.png)
+
+### 15. 数据传输层次
+
+![1594641762138](./../..\pictures\Java\socket\数据传输层次.png)
+
+## UDP 快速入门
+
+### 1. UDP 是什么
+
+> User Datagram Protocal，一种用户数据报协议，又称用户数据报文协议，是一种非连接协议
+>
+> 简单面向数据报的传输层协议，正是规范为 RFC 768
+
+### 2. 为什么不可靠
+
+- 一旦把网络层数据发送出去，就不保留数据备份
+- UDP 在 IP 数据包的头部仅仅加入了复用和数据校验字段
+- 发送端生产数据，接收端从网络中抓取数据
+- 结构简单，无校验，速度快，容易丢包，可以广播
+
+### 3. UDP 能做什么
+
+- DNS、TFTP、SNMP
+- 视频、音频、普通数据（无关紧要数据）
+
+- UDP 包最大长度为 65535 - 28 = 65507 byte
+  - udp包头占8字节, ip包头占20字节
+
+### 4. UDP 核心 API 讲解
+
+- DatagramSocket
+
+  >  用于接受与发送 UDP 的类
+  >
+  > 负责发送或者接受 UDP 包
+  >
+  > 不同于 TCP，UDP 并没有合并到 Socket API 中
+
+  - DatagramSocket()
+
+    创建简单实例，不指定端口和 IP
+
+  - DatagramSocket(int port)
+
+    创建监听固定端口的实例
+
+  - DatagramSocket(int port，InetAddress localAddr)
+
+    创建固定端口和指定 IP 的实例
+
+  - receive(DatagramPacket d)
+
+    接受
+
+  - send(DatagramPacket d)
+
+    发送
+
+  - setSoTimeout(int timeout)
+
+    设置超时，毫秒
+
+  - close()
+
+    关闭，释放资源
+
+- DatagramPacket
+
+  > 用于处理报文
+  >
+  > 将 byte 数组、目标地址、目标端口等数据包装成报文或者将报文拆解成 byte 数组
+
+  - DatagramSocket(byte[] buf,int offset,int length,InetAddress address,int port)
+
+    前面三个参数指 buf 的使用区间
+
+    后面两个参数指定目标机器地址与端口
+
+  - DatagramSocket(byte[] buf,int offset,int length,SocketAddress address)
+
+    前面三个参数指 buf 的使用区间
+
+    SocketAddress 相当于 InetAddress  + Port
+
+  - setData(byte[] buf,int offset,int length)
+
+  - setData(byte[] buf)
+
+  - setData(int length)
+
+  - getData()、getOffset()、getLength()
+
+  - setAddress(InetAddress address)、setPort(int port)
+
+    发送时有效，告诉接收方有关发送方的信息
+
+  - setSocketAddress(SocketAddress address)
+
+### 5. 单播、广播、多播（按组来发送）
+
+![1594643598200](E:\Java\new_Java_Study\daily_notes\pictures\Java\socket\单播广播多播.png)
+
+![1594644523682](./../..\pictures\Java\socket\IP地址分类.png)
+
+- C 网广播地址一般为：XXX.XXX.XXX.255
+
+### 6. IP 地址构成
+
+![1594647610778](./../..\pictures\Java\socket\IP 地址构成.png)
+
+### 7. 广播地址运算
+
+- IP 地址：192.168.1.7
+- 网络地址：192.168.1.0
+- 子网掩码：255.255.255.192 --》可分为 2^2 = 4 个网段
+- 广播地址为：192.168.1.63
